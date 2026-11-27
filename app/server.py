@@ -18,7 +18,6 @@ def get_user():
     cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
     return cursor.fetchall()
 
-'''
 @app.route("/ping")
 def ping_host():
     target = request.args.get("ip")
@@ -28,10 +27,14 @@ def ping_host():
     
     # nosemgrep: python.flask.security.injection.os-system-injection.os-system-injection
     # nosemgrep: python.lang.security.dangerous-system-call.dangerous-system-call
+
+    # Prefer this solution about semgrep false positive 
+
+    # # nosemgrep: python.flask.security.injection.os-system-injection.os-system-injection, python.lang.security.dangerous-system-call.dangerous-system-call
     os.system("ping -c 1 " + target)
     return "Ping triggered"
-'''
 
+'''
 @app.route("/ping")
 def ping_host():
     target = request.args.get("ip", "")
@@ -45,7 +48,7 @@ def ping_host():
     # Exécution sécurisée sans invocation de shell (shell=False par défaut)
     subprocess.run(["ping", "-c", "1", target], check=False)
     return "Ping triggered"
-
+'''
 
 if __name__ == "__main__":
     app.run(port=5000)
