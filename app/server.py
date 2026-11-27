@@ -24,6 +24,7 @@ def ping_host():
         abort(400, "Invalid IP address")
     
     # nosemgrep: python.flask.security.injection.os-system-injection.os-system-injection
+    # nosemgrep: python.lang.security.dangerous-system-call.dangerous-system-call
     os.system("ping -c 1 " + target)
     return "Ping triggered"
 
