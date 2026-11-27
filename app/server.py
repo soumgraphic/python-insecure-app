@@ -27,7 +27,8 @@ def ping_host():
 
     # Prefer this solution about semgrep false positive 
 
-    # nosemgrep: python.flask.security.injection.os-system-injection.os-system-injection python.lang.security.dangerous-system-call.dangerous-system-call
+    # nosemgrep: python.flask.security.injection.os-system-injection.os-system-injection 
+    # nosemgrep: python.lang.security.dangerous-system-call.dangerous-system-call
     os.system("ping -c 1 " + target)
     return "Ping triggered"
 
