@@ -8,7 +8,8 @@ on:
 
 permissions:
   contents: read
-  security-events: write # Requis pour publier les alertes SARIF dans l'onglet Security de GitHub
+  security-events: write # Requis pour publier les alertes dans l'onglet Security
+  actions: read          # Requis pour la gestion des artefacts de build
 
 jobs:
   semgrep-sast:
@@ -21,7 +22,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Run Semgrep SAST Analysis
+      # Étape 1 : Un seul scan pour générer le SARIF et bloquer la CI en cas de vulnérabilité
+      - name: Run Semgrep SAST Scan
         run: |
           semgrep scan \
             --config "p/default" \
@@ -30,8 +32,18 @@ jobs:
             --output semgrep-results.sarif \
             --error
 
-      - name: Upload SARIF report to GitHub Advanced Security
+      # Étape 2 : Publier les résultats dans GitHub Advanced Security (Alertes & PRs)
+      - name: Upload SARIF to GitHub Security
         uses: github/codeql-action/upload-sarif@v3
-        if: always() # Publie le rapport même si Semgrep a trouvé des failles et a échoué
+        if: always() # Exécuté même si Semgrep détecte des failles et échoue
         with:
           sarif_file: semgrep-results.sarif
+
+      # Étape 3 : Rendre le fichier SARIF téléchargeable dans l'onglet Actions
+      - name: Upload SARIF Artifact
+        uses: actions/upload-artifact@v4
+        if: always() # Permet de télécharger le rapport même en cas d'échec
+        with:
+          name: semgrep-results.sarif
+          path: semgrep-results.sarif
+          retention-days: 14
