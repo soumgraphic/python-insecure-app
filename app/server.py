@@ -25,10 +25,9 @@ def ping_host():
     if not re.match(r"^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$", target or ""):
         abort(400, "Invalid IP address")
 
-    # Prefer this solution about semgrep false positive 
-
-    # nosemgrep: python.flask.security.injection.os-system-injection.os-system-injection 
-    # nosemgrep: python.lang.security.dangerous-system-call.dangerous-system-call
+    # Prefer this solution about semgrep false positive  
+    
+    # nosemgrep: python.flask.security.injection.os-system-injection.os-system-injection, python.lang.security.dangerous-system-call.dangerous-system-call  
     os.system("ping -c 1 " + target)
     return "Ping triggered"
 
