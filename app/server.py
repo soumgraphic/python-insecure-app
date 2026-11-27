@@ -1,4 +1,6 @@
 # server.py (Version corrigée et requalifiée)
+from asyncio import subprocess
+import ipaddress
 import sqlite3
 import os
 import re
@@ -16,6 +18,7 @@ def get_user():
     cursor.execute("SELECT * FROM users WHERE id = ?", (user_id,))
     return cursor.fetchall()
 
+'''
 @app.route("/ping")
 def ping_host():
     target = request.args.get("ip")
@@ -27,6 +30,22 @@ def ping_host():
     # nosemgrep: python.lang.security.dangerous-system-call.dangerous-system-call
     os.system("ping -c 1 " + target)
     return "Ping triggered"
+'''
+
+@app.route("/ping")
+def ping_host():
+    target = request.args.get("ip", "")
+    
+    # Validation native d'une adresse IPv4 ou IPv6 valide
+    try:
+        ipaddress.ip_address(target)
+    except ValueError:
+        abort(400, "Invalid IP address")
+    
+    # Exécution sécurisée sans invocation de shell (shell=False par défaut)
+    subprocess.run(["ping", "-c", "1", target], check=False)
+    return "Ping triggered"
+
 
 if __name__ == "__main__":
     app.run(port=5000)
